@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
-
+import collections
 import logging
 logger = logging.getLogger(__name__)
 
@@ -9,40 +9,37 @@ from django.core.exceptions import ValidationError
 
 class BaseImporter:
     """
-    Base importer class, which handles model creation
+    Importer users Retriever to get FileLike object with raw data and pass it to the Parser.
+    Wher parser returns arguments for models, Importer creates models
     """
-    def __init__(self, model):
-        self.model = model
+    parser = None
+    retriever = None
+    model = None
 
-    def import_data(self, address):
+    def __init__(self, model=None, parser=None, retriever=None):
+        if model:
+            self.model = model
+        if parser:
+            self.parser = parser
+        if retriever:
+            self.retriever = retriever
+
+    def import_data(self):
         """
         Main method for importing data
-        :param address: URI for access data
-        :return:
         """
-        read_obj = self.get_read_object(address)
-        self.parse_data(read_obj)
+        data_obj = self.retriever.get_raw_data()
+        parsed_data = self.parser.parse(data_obj)
+        if isinstance(parsed_data, collections.Iterable):
+            for item in parsed_data:
+                self.create_model(item)
+        elif isinstance(parsed_data, dict):
+            self.create_model(parsed_data)
 
-    def get_read_object(self, address):
-        """
-        Returns file-like object from given address
-        :param address: URI for data
-        :return: file-like object
-        """
-        raise NotImplementedError
-
-    def parse_data(self, source):
-        """
-        Parses data from sources and calls create_model when data for single model is parsed
-        :param source: address of source data. URL or file path
-        :return: None
-        """
-        raise NotImplementedError
-
-    def create_model(self, parsed_data):
+    def create_model(self, item_data):
         """
 
-        :param parsed_data: dictionary, where:
+        :param item_data: dictionary, where:
             - keys are model fields
             - values are a data for that fields. If field is Foreign key or ManyToMany field,
               value should contain only id of relation.
@@ -50,6 +47,6 @@ class BaseImporter:
         :return:
         """
         try:
-            self.model.objects.create(**parsed_data)
+            self.model.objects.create(**item_data)
         except ValidationError as exc:
             logger.error("Error during import model {0}: {1}".format(self.model, exc))

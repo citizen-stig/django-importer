@@ -2,7 +2,11 @@
 # -*- encoding: utf-8 -*-
 import unittest
 
-from django_importer.importers.rss import RSSImporter
+from django_importer.parsers.generic import RSSParser
+from django_importer.parsers.base import Field, XMLField
+from django_importer.retrievers.base import HTTPRetriver
+from django_importer.importers.base import BaseImporter
+
 
 
 class Creator:
@@ -23,14 +27,24 @@ class DummyModel:
         self.data.append(data)
 
 
+
 class RSSImporterTests(unittest.TestCase):
 
     def test_simple_import(self):
         model = DummyModel()
-        mapping = {x: x for x in ('link', 'category', 'pubDate')}
-        rss_importer = RSSImporter(model, mapping)
+
+        class Parser(RSSParser):
+            link = XMLField('link')
+            category = XMLField('category')
+            pub_data = XMLField('pubDate')
+
+        parser = Parser(model)
+        retriever = HTTPRetriver('http://www.feedforall.com/sample.xml')
+
+        importer = BaseImporter(model=model, parser=parser, retriever=retriever)
+
         # TODO: replace with httpretty
-        rss_importer.import_data('http://www.feedforall.com/sample.xml')
+        importer.import_data()
         print(model.data)
         print(len(model.data))
         self.assertEqual(len(model.data), 9)
