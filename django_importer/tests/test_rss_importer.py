@@ -3,10 +3,9 @@
 import unittest
 
 from django_importer.parsers.generic import RSSParser
-from django_importer.parsers.base import Field, XMLField
-from django_importer.retrievers.base import HTTPRetriver
+from django_importer.parsers.base import Field, SimpleXMLField
+from django_importer.retrievers.base import HTTPRetriever
 from django_importer.importers.base import BaseImporter
-
 
 
 class Creator:
@@ -27,19 +26,18 @@ class DummyModel:
         self.data.append(data)
 
 
-
 class RSSImporterTests(unittest.TestCase):
 
     def test_simple_import(self):
         model = DummyModel()
 
         class Parser(RSSParser):
-            link = XMLField('link')
-            category = XMLField('category')
-            pub_data = XMLField('pubDate')
+            link = SimpleXMLField()
+            category = SimpleXMLField()
+            pub_data = SimpleXMLField('pubDate')
 
         parser = Parser(model)
-        retriever = HTTPRetriver('http://www.feedforall.com/sample.xml')
+        retriever = HTTPRetriever('http://www.feedforall.com/sample.xml')
 
         importer = BaseImporter(model=model, parser=parser, retriever=retriever)
 

@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 class BaseImporter:
     """
     Importer users Retriever to get FileLike object with raw data and pass it to the Parser.
-    Wher parser returns arguments for models, Importer creates models
+    When parser returns arguments for models, Importer creates models
     """
     parser = None
     retriever = None

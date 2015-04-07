@@ -4,7 +4,7 @@ import http.client
 from urllib.parse import urlparse
 
 
-class Retriver:
+class Retriever:
     """
     Gets URI
     Returns file like object
@@ -17,9 +17,9 @@ class Retriver:
         raise NotImplementedError
 
 
-class HTTPRetriver(Retriver):
+class HTTPRetriever(Retriever):
     """
-    Gets data from HTTP or HTTPS
+    Gets data from HTTP or HTTPS Server
     """
     def __init__(self, URI):
         parsed_url = urlparse(URI)

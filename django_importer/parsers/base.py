@@ -13,7 +13,7 @@ class Field:
         self.field_name = None
         self.parent = None
 
-    def bind(self, field_name, parent):
+    def bind(self, parent, field_name):
         self.field_name = field_name
         self.parent = parent
 
@@ -21,22 +21,29 @@ class Field:
         return dictionary.get(self.field_name, self.default)
 
 
-class XMLField(Field):
+class SimpleXMLField(Field):
+    """
+    Extract value from XML tag
+    """
 
-    def __init__(self, entity_name, *args, **kwargs):
+    def __init__(self, entity_name=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.entity_name = entity_name
 
     def get_value(self, xml_item):
         try:
-            return xml_item.find(self.entity_name).text
+            if self.entity_name:
+                return xml_item.find(self.entity_name).text
+            else:
+                # Entity name is not specified, assume, that it is equal to field_name
+                return xml_item.find(self.field_name).text
         except AttributeError:
             return self.default
 
 
 class ForeignField(Field):
     """
-    Get
+    Get correct value for Foreign key
     """
 
     def __init__(self, lookup_field_name, *args, **kwargs):
@@ -50,9 +57,13 @@ class ForeignField(Field):
         return value
 
 
-class ForeignXMLField(XMLField, ForeignField):
+class ForeignXMLField(SimpleXMLField, ForeignField):
     pass
 
+
+class ManyToManyField(Field):
+    # TODO: implement this
+    pass
 
 class Parser:
     """
