@@ -30,6 +30,5 @@ class XMLParser(Parser):
                 logger.error("Error: {0}".format(exc))
 
 
-
 class RSSParser(XMLParser):
     items_xpath = './channel/item'
