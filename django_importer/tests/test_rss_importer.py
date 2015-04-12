@@ -36,10 +36,9 @@ class RSSImporterTests(unittest.TestCase):
             category = Field()
             pub_data = Field(key='pubDate')
 
-        parser = Parser(model)
         retriever = HTTPRetriever('http://www.feedforall.com/sample.xml')
 
-        importer = BaseImporter(model=model, parser=parser, retriever=retriever)
+        importer = BaseImporter(model=model, parser_class=Parser, retriever=retriever)
 
         # TODO: replace with httpretty
         importer.import_data()

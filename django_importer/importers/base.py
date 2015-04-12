@@ -12,15 +12,16 @@ class BaseImporter:
     Importer users Retriever to get FileLike object with raw data and pass it to the Parser.
     When parser returns arguments for models, Importer creates models
     """
-    parser = None
+    parser_class = None
     retriever = None
     model = None
 
-    def __init__(self, model=None, parser=None, retriever=None):
+    def __init__(self, model=None, parser_class=None, retriever=None):
         if model:
             self.model = model
-        if parser:
-            self.parser = parser
+        if parser_class:
+            self.parser_class = parser_class
+        self.parser = self.parser_class(self.model)
         if retriever:
             self.retriever = retriever
 
@@ -49,4 +50,4 @@ class BaseImporter:
         try:
             self.model.objects.create(**item_data)
         except ValidationError as exc:
-            logger.error("Error during import model {0}: {1}".format(self.model, exc))
+            logger.error("Error during import model: {0}".format(exc))

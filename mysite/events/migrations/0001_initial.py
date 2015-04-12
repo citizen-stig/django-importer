@@ -14,25 +14,25 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Event',
             fields=[
-                ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=120)),
                 ('description', models.CharField(max_length=120, blank=True)),
-                ('date', models.DateField()),
+                ('date', models.CharField(max_length=120)),
             ],
             bases=(events.models.NameRepresentation, models.Model),
         ),
         migrations.CreateModel(
             name='EventType',
             fields=[
-                ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=120)),
             ],
             bases=(events.models.NameRepresentation, models.Model),
         ),
         migrations.CreateModel(
-            name='Place',
+            name='Person',
             fields=[
-                ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=120)),
                 ('address', models.CharField(max_length=120)),
             ],
@@ -40,8 +40,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='event',
-            name='place',
-            field=models.ManyToManyField(to='events.Place'),
+            name='people',
+            field=models.ManyToManyField(to='events.Person', blank=True),
         ),
         migrations.AddField(
             model_name='event',

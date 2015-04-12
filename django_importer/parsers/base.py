@@ -8,13 +8,15 @@ class Field:
     """
     def __init__(self, default=None, key=None):
         self.default = default
-        self.key = key
+        self.key = key  # Actual value is retrieved using key
         # These are set up by `.bind()` when the field is added to a serializer.
         self.field_name = None
         self.parent = None
 
     def bind(self, parent, field_name):
         self.field_name = field_name
+        if self.key is None:
+            self.key = self.field_name
         self.parent = parent
 
     def get_value(self, raw_value):
@@ -32,15 +34,17 @@ class ForeignField(Field):
 
     def get_value(self, *args, **kwargs):
         key_value = super().get_value(*args, **kwargs)
-        foreign_model = getattr(self.parent.model, str(self.field_name))
+        foreign_model = self.parent.model._meta.get_field(self.field_name).rel.to
         value = foreign_model.objects.get(**{self.lookup_field_name: key_value})
         return value
 
 
 class ManyToManyField(Field):
-    # TODO: implement this
     pass
-
+    # TODO: implement this
+    # 1 - get keys for foreign model from raw data.
+    # 2 - find all objects ids
+    # 3 - create M2M relation
 
 class Parser:
     """

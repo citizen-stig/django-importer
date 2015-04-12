@@ -7,7 +7,7 @@ class NameRepresentation:
         return self.name
 
 
-class Place(NameRepresentation, models.Model):
+class Person(NameRepresentation, models.Model):
     name = models.CharField(max_length=120)
     address = models.CharField(max_length=120)
 
@@ -19,6 +19,6 @@ class EventType(NameRepresentation, models.Model):
 class Event(NameRepresentation, models.Model):
     name = models.CharField(max_length=120)
     description = models.CharField(max_length=120, blank=True)
-    date = models.DateField()
+    date = models.CharField(max_length=120)
     type = models.ForeignKey(EventType)
-    place = models.ManyToManyField(Place)
+    people = models.ManyToManyField(Person, blank=True)
