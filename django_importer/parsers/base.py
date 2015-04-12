@@ -6,9 +6,9 @@ class Field:
     """
     Similar to Django Rest Framework field. Holds logic for retrieving value for specific field
     """
-    def __init__(self, default=None):
-
+    def __init__(self, default=None, key=None):
         self.default = default
+        self.key = key
         # These are set up by `.bind()` when the field is added to a serializer.
         self.field_name = None
         self.parent = None
@@ -17,28 +17,8 @@ class Field:
         self.field_name = field_name
         self.parent = parent
 
-    def get_value(self, dictionary):
-        return dictionary.get(self.field_name, self.default)
-
-
-class SimpleXMLField(Field):
-    """
-    Extract value from XML tag
-    """
-
-    def __init__(self, entity_name=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.entity_name = entity_name
-
-    def get_value(self, xml_item):
-        try:
-            if self.entity_name:
-                return xml_item.find(self.entity_name).text
-            else:
-                # Entity name is not specified, assume, that it is equal to field_name
-                return xml_item.find(self.field_name).text
-        except AttributeError:
-            return self.default
+    def get_value(self, raw_value):
+        return raw_value
 
 
 class ForeignField(Field):
@@ -57,13 +37,10 @@ class ForeignField(Field):
         return value
 
 
-class ForeignXMLField(SimpleXMLField, ForeignField):
-    pass
-
-
 class ManyToManyField(Field):
     # TODO: implement this
     pass
+
 
 class Parser:
     """
